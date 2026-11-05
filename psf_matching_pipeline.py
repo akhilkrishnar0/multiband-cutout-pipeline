@@ -9,7 +9,7 @@ from astropy.convolution import Gaussian2DKernel, convolve_fft
 from astropy.visualization import simple_norm
 DEFAULT_FWHM = {"g":1.3,"r":1.2,"z":1.1,"FUV":4.2,"NUV":5.3}
 def pixel_scale_arcsec(header):
-    scales = WCS(header).celestial.proj_plane_pixel_scales().to(u.arcsec).value
+    scales = np.asarray([s.to_value(u.arcsec) if hasattr(s,"to_value") else float(s)*3600.0 for s in WCS(header).celestial.proj_plane_pixel_scales()],dtype=float)
     if not np.all(np.isfinite(scales)) or np.any(scales <= 0):
         raise ValueError("Invalid celestial WCS pixel scale")
     if abs(scales[0]-scales[1])/np.mean(scales) > 0.01:
